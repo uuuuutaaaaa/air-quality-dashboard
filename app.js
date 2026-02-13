@@ -13,12 +13,9 @@ const mqttPassphraseEl          = document.getElementById("mqttPassphrase");
 const mqttConnectBtn            = document.getElementById("mqttConnectButton");
 const mqttErrorEl               = document.getElementById("mqttError");
 
-const airQualityEl                = document.getElementById("airQuality");
-const envTimestampEl            = document.getElementById("envTimestamp");
+const airQualityEl              = document.getElementById("airQuality");
 
 const uptimeEl                  = document.getElementById("uptime");
-const controlModeEl             = document.getElementById("controlMode");
-const lightStateEl              = document.getElementById("lightState");
 const sysTimestampEl            = document.getElementById("sysTimestamp");
 
 // Timestamp
@@ -31,12 +28,9 @@ let connecting = false;
 
 // Last sensor values
 let lastStatusAirQuality  = null;
-let lastSensorTimestamp   = null; // seconds
 
 // Last device state
 let lastUptime          = null; // number or null
-let lastDesiredLight    = null; // boolean or null
-let lastMode            = null; // "auto" | "manual" | null
 let lastSystemTimestamp = null; // seconds
 
 // Encrypted MQTT password
@@ -222,10 +216,7 @@ function clearMqttError() {
 
 function applyDeviceStatusToUI() {
 	setText(airQualityEl, valueToText(lastStatusAirQuality));
-	setText(envTimestampEl, displayDateAndTimeSince(lastSensorTimestamp));
 	setText(uptimeEl, displayTime(lastUptime));
-	setText(lightStateEl, valueToText(lastDesiredLight));
-	setText(controlModeEl, valueToText(lastMode));
 	setText(sysTimestampEl, displayDateAndTimeSince(lastSystemTimestamp));
 	updateLastUpdateText();
 }
@@ -332,10 +323,7 @@ function attachMqttHandlers(client) {
 
 		if (topic === `${ROOT_TOPIC}/status/sensors`) {
 			lastStatusAirQuality = ifMsgValueElseNull("air_quality");
-			lastSensorTimestamp  = ifMsgValueElseNull("timestamp");
 		} else if (topic === `${ROOT_TOPIC}/status/effectors`) {
-			lastDesiredLight     = ifMsgValueElseNull("desired_grow_light_on");
-			lastMode             = ifMsgValueElseNull("mode");
 			lastSystemTimestamp  = ifMsgValueElseNull("timestamp");
 		} else if (topic === `${ROOT_TOPIC}/status/system`) {
 			lastUptime           = ifMsgValueElseNull("uptime_s");
@@ -352,7 +340,6 @@ function attachMqttHandlers(client) {
 // Initial UI state
 setText(airQualityEl, null);
 setText(uptimeEl, null);
-setText(controlModeEl, null);
-setText(lightStateEl, null);
+setText(sysTimestampEl, null);
 connectionStatusEl.textContent = "disconnected";
 setInterval(updateLastUpdateText, 1000);
